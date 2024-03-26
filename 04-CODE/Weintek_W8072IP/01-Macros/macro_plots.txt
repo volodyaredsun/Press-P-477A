@@ -1,0 +1,81 @@
+bool Plot_STOP														// хотел глобальную сделать, не понадобилась, так и оставил
+
+macro_command main()
+
+unsigned short size = 99											// общий размер данных для графика
+unsigned short x[99], y[99]											// массивы для циклического вращения данных в массивах графика
+unsigned short x0[99] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+unsigned short y0[99] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+
+int x_new, y_new													// новые данные считанные из ПЛК
+int x_old, y_old													// старые данныее выведенные на график
+float x_new_f, y_new_f
+unsigned short bit0 = 0												// вспомогательная константа 0
+unsigned short bit1 = 1												// вспомогательная константа 1
+unsigned short cntr													// 1 - построить график, 2 - стереть график, 3 - стереть и построить график
+unsigned short enc_rst												// бит на панели оператора, будем ли сбрасывать энкодер при включении рабочего хода или нет
+
+bool Plot_RUN
+GetData(Plot_RUN, "Mitsubishi FX3U/FX3G/FX3GA", "Plot_run", 1)
+
+if Plot_RUN == 1 then
+	if Plot_STOP == 1 then
+		Plot_STOP = 0
+		GetData(enc_rst, "Local HMI", RW_Bit, 0, 1)
+		if enc_rst == 0 then
+			SetData(bit1, "Mitsubishi FX3U/FX3G/FX3GA", "ENC_rst", 1)
+			SetData(bit0, "Mitsubishi FX3U/FX3G/FX3GA", "ENC_rst", 1)	// не понятно нужно ли тут так тикать битом, может достаточно его установить, он сам сбросится...
+		end if
+		SetData(x0[0], "Local HMI", "Xarray", size)					// обнуляем массивы координат
+		SetData(y0[0], "Local HMI", "Yarray", size)
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)			// несколько раз очищаю график, не всегда успевает отработать очистка
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)
+		cntr = 2
+		SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)
+	end if
+	
+	GetData(x_new_f, "Mitsubishi FX3U/FX3G/FX3GA", D, 50, 1)		// координата float
+	GetData(y_new_f, "Mitsubishi FX3U/FX3G/FX3GA", D, 48, 1)		// давление float
+	
+	if x_new_f < 0 then												// если не занулить, то график выходит с противоположной стороны
+		x_new_f = 0
+	end if
+	if y_new_f < 0 then
+		y_new_f = 0
+	end if
+	
+	x_new = x_new_f	// можно не преобразовывать float to int
+	y_new = y_new_f
+
+	if (not (x_new == x_old)) or (not (y_new == y_old)) then		// если данные поменялись, то вносим новые данные в массивы
+		GetData(x[1], "Local HMI", "Xarray", size-1)
+		x[0] = x_new
+		SetData(x[0], "Local HMI", "Xarray", size)
+
+		GetData(y[1], "Local HMI", "Yarray", size-1)
+		y[0] = y_new
+		SetData(y[0], "Local HMI", "Yarray", size)
+	end if
+
+	x_old = x_new
+	y_old = y_new
+
+	SetData(size, "Local HMI", "PlotXY_num_HMI", 1)		// количество точек для графика
+	cntr = 3
+	SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)	// команда для графика
+else
+	Plot_STOP = 1
+	SetData(size, "Local HMI", "PlotXY_num_HMI", 1)		// количество точек для графика
+	cntr = 3
+	SetData(cntr, "Local HMI", "PlotXY_cntr_HMI", 1)	// команда для графика
+end if
+
+end macro_command

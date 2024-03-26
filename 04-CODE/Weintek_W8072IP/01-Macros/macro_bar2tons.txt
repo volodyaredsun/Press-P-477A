@@ -1,0 +1,13 @@
+
+macro_command main()
+float p
+// d = 630mm, S = 0.31m2, F[N] = p[Pa=N/m2] *  S[m2]
+// 1[bar] =  100 000 [Pa]
+// 1[ton] = 9 806.652[N]
+// F_tons = Pb * (100000 * 0.31) / 9806.6652
+float k = 3.1611
+int F_tons
+GetData(p, "Mitsubishi FX3U/FX3G/FX3GA", "Pressure", 1)
+F_tons = p * k
+SetData(F_tons, "Local HMI", "F_tons", 1)
+end macro_command

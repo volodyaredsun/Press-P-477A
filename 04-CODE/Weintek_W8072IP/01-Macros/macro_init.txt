@@ -1,0 +1,14 @@
+
+macro_command main()
+unsigned char bit = 1
+// отключиение сообщения - Deivece no response, не понятно какой именно тег установить, может и все нужно
+SetData(bit, "Local HMI", LB, 11960, 1)
+SetData(bit, "Local HMI", LB, 11961, 1)
+SetData(bit, "Local HMI", LB, 11962, 1)
+SetData(bit, "Local HMI", LB, 11963, 1)
+SetData(bit, "Local HMI", LB, 11964, 1)
+SetData(bit, "Local HMI", LB, 11965, 1)
+SetData(bit, "Local HMI", LB, 11966, 1)
+SetData(bit, "Local HMI", LB, 11967, 1)
+SetData(bit, "Local HMI", LB, 12023, 1)
+end macro_command
