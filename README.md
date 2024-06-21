@@ -4,4 +4,4 @@
 
 HMI - WeinView M8072IP, среда разработки Easy Builder Pro
 
-PLC - FX3U-20MR, среда разработки 
+PLC - FX3U-20MR, среда разработки GX-Work 2
